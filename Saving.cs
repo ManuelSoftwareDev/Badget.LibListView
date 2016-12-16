@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 using static System.Windows.Forms.ListViewItem;
 
 namespace Badget.LibListview.Saving
-{
+{ 
     /// <summary>
     /// Provides a <see cref="CSVItemsFile"/> Class 
     /// </summary>
@@ -159,12 +159,12 @@ namespace Badget.LibListview.Saving
             if (listview == null)
                 throw new ArgumentNullException("listview");
 
-            XmlSerializer serializer = new XmlSerializer(typeof(ListViewModifiedItem));
+            XmlSerializer serializer = new XmlSerializer(typeof(ListViewSerializedItem));
             StreamReader reader = new StreamReader(file);
 
             if (serializer.CanDeserialize(XmlReader.Create(reader)))
             {
-                ListViewModifiedItem[] items = (ListViewModifiedItem[])serializer.Deserialize(reader);
+                ListViewSerializedItem[] items = (ListViewSerializedItem[])serializer.Deserialize(reader);
                 
                 foreach(var item in items)
                 {
@@ -188,14 +188,14 @@ namespace Badget.LibListview.Saving
             if (!File.Exists(file))
                 throw new FileNotFoundException();
 
-            XmlSerializer serializer = new XmlSerializer(typeof(ListViewModifiedItem));
+            XmlSerializer serializer = new XmlSerializer(typeof(ListViewSerializedItem));
             StreamReader reader = new StreamReader(file);
 
             List<ListViewItem> Items = new List<ListViewItem>();
 
             if (serializer.CanDeserialize(XmlReader.Create(reader)))
             {
-                ListViewModifiedItem[] items = (ListViewModifiedItem[])serializer.Deserialize(reader);
+                ListViewSerializedItem[] items = (ListViewSerializedItem[])serializer.Deserialize(reader);
 
                 foreach (var item in items)
                 {
@@ -258,27 +258,43 @@ namespace Badget.LibListview.Saving
             if (!Directory.Exists(Path.GetDirectoryName(file)))
                 Directory.CreateDirectory(file);
 
-            List<ListViewModifiedItem> modAll = new List<ListViewModifiedItem>();
+            List<ListViewSerializedItem> modAll = new List<ListViewSerializedItem>();
 
             foreach(ListViewItem i in items)
             {
-                ListViewModifiedItem item = new ListViewModifiedItem(i);
+                ListViewSerializedItem item = new ListViewSerializedItem(i);
+                foreach(ListViewSubItem itemSub in i.SubItems)
+                {
+                    
+                }
                 modAll.Add(item);
             }
 
-            XmlSerializer serializer = new XmlSerializer(typeof(ListViewModifiedItem));
+            XmlSerializer serializer = new XmlSerializer(typeof(ListViewSerializedItem));
             StreamWriter writer = new StreamWriter(file);
 
             serializer.Serialize(writer, modAll.ToArray());
-        }
 
-        internal struct ListViewModifiedItem
+            writer.Close();
+            writer.Dispose();
+        }
+        /// <summary>
+        /// Provides a struct for a serializable ListView Item
+        /// </summary>
+        public struct ListViewSerializedItem
         {
             public ListViewItem ToListViewItem()
             {
                 ListViewItem i = new ListViewItem();
                 i.Text = Text;
-                i.SubItems.AddRange(SubItems);
+                List<ListViewSubItem> subitems = new List<ListViewSubItem>();
+                foreach (var item in SubItems)
+                {
+                    var lstItem = item.ToListViewItem();
+                    ListViewSubItem subItem = new ListViewSubItem(i, lstItem.Text, lstItem.ForeColor, lstItem.BackColor, lstItem.Font);
+                    subitems.Add(subItem);
+                }
+                i.SubItems.AddRange(subitems.ToArray());
                 i.Name = Name;
                 i.BackColor = ColorTranslator.FromHtml(BackColor.ColorHEX);
                 i.ForeColor = ColorTranslator.FromHtml(ForeColor.ColorHEX);
@@ -296,13 +312,13 @@ namespace Badget.LibListview.Saving
                 return i;
             }
 
-            public ListViewModifiedItem(ListViewItem item)
+            public ListViewSerializedItem(ListViewItem item)
             {
                 Text = item.Text;
 
-                List<ListViewSubItem> sub = new List<ListViewSubItem>();
-                foreach (ListViewSubItem itemS in item.SubItems)
-                    sub.Add(itemS);
+                List<ListViewSerializedItem> sub = new List<ListViewSerializedItem>();
+                foreach (ListViewItem itemS in item.SubItems)
+                    sub.Add(new Saving.XMLItemsFile.ListViewSerializedItem(itemS));
                 SubItems = sub.ToArray();
 
                 Name = item.Name;
@@ -322,7 +338,7 @@ namespace Badget.LibListview.Saving
             }
 
             string Text;
-            ListViewSubItem[] SubItems;
+            ListViewSerializedItem[] SubItems;
             string Name;
             ColorCC BackColor;
             ColorCC ForeColor;
