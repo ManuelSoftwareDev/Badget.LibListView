@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{00AB1117-88E6-4632-B501-AA0E66C0755E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Badget.LibListview</RootNamespace>
+    <AssemblyName>Badget.LibListview</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Badget.LibListview.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Design" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls.cs" />
+    <Compile Include="CustomListView\BorderStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomListView\ColumnCollection.cs" />
+    <Compile Include="CustomListView\GlacialList.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomListView\GLComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomListView\GLDateTimePicker.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomListView\GLEmbeddedControl.cs" />
+    <Compile Include="CustomListView\GLMergeSort.cs" />
+    <Compile Include="CustomListView\GLQuickSort.cs" />
+    <Compile Include="CustomListView\GLTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomListView\HelperFunctions.cs" />
+    <Compile Include="CustomListView\ItemCollection.cs" />
+    <Compile Include="CustomListView\ManagedHScrollBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomListView\ManagedVScrollBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="CustomListView\ThemeRoutines.cs" />
+    <Compile Include="CustomListView\Win32.cs" />
+    <Compile Include="Saving.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sorting.cs" />
+    <Compile Include="WebSupport.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CustomListView\BorderStrip.resx">
+      <DependentUpon>BorderStrip.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomListView\GlacialList.resx">
+      <DependentUpon>GlacialList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomListView\GLComboBox.resx">
+      <DependentUpon>GLComboBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomListView\GLDateTimePicker.resx">
+      <DependentUpon>GLDateTimePicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomListView\GLTextBox.resx">
+      <DependentUpon>GLTextBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomListView\ManagedHScrollBar.resx">
+      <DependentUpon>ManagedHScrollBar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomListView\ManagedVScrollBar.resx">
+      <DependentUpon>ManagedVScrollBar.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="CustomListView\checked.bmp" />
+    <Content Include="CustomListView\GlacialList.bmp" />
+    <Content Include="CustomListView\GlacialList.csproj" />
+    <Content Include="CustomListView\unchecked.bmp" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

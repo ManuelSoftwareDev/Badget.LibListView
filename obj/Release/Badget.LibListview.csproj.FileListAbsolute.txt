@@ -1,0 +1,14 @@
+D:\Projects\Badget.LibListview\Badget.LibListview\bin\Release\Badget.LibListview.dll
+D:\Projects\Badget.LibListview\Badget.LibListview\bin\Release\Badget.LibListview.pdb
+D:\Projects\Badget.LibListview\Badget.LibListview\obj\Release\Badget.LibListview.csprojResolveAssemblyReference.cache
+D:\Projects\Badget.LibListview\Badget.LibListview\obj\Release\Badget.LibListview.Controls.BorderStrip.resources
+D:\Projects\Badget.LibListview\Badget.LibListview\obj\Release\Badget.LibListview.Controls.BadgetListView.resources
+D:\Projects\Badget.LibListview\Badget.LibListview\obj\Release\Badget.LibListview.Controls.GLComboBox.resources
+D:\Projects\Badget.LibListview\Badget.LibListview\obj\Release\Badget.LibListview.Controls.GLDateTimePicker.resources
+D:\Projects\Badget.LibListview\Badget.LibListview\obj\Release\Badget.LibListview.Controls.GLTextBox.resources
+D:\Projects\Badget.LibListview\Badget.LibListview\obj\Release\Badget.LibListview.Controls.ManagedHScrollBar.resources
+D:\Projects\Badget.LibListview\Badget.LibListview\obj\Release\Badget.LibListview.Controls.ManagedVScrollBar.resources
+D:\Projects\Badget.LibListview\Badget.LibListview\obj\Release\Badget.LibListview.csproj.GenerateResource.Cache
+D:\Projects\Badget.LibListview\Badget.LibListview\obj\Release\Badget.LibListview.dll
+D:\Projects\Badget.LibListview\Badget.LibListview\obj\Release\Badget.LibListview.pdb
+D:\Projects\Badget.LibListview\Badget.LibListview\bin\Release\Badget.LibListview.xml
