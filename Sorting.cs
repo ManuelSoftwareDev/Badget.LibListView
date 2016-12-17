@@ -52,9 +52,18 @@ namespace Badget.LibListview.Sorting
         /// <param name="listview">ListView where Sorter is working</param>
         /// <param name="showSortArrow">Wheter a SortArrow is shown when SortOrder Changes</param>
         /// <returns></returns>
-        public static Sorter RegisterSorter(ListView listview, bool showSortArrow)
+        public static Sorter RegisterSorter(ListView listview, bool showSortArrow = false)
         {
-            return new Sorting.Sorter(listview, showSortArrow);
+            return new Sorter(listview, showSortArrow);
+        }
+
+        /// <summary>
+        /// Unregisters a Sorter
+        /// </summary>
+        /// <param name="sorter">Sorter Instance</param>
+        public static void UnregisterSorter(Sorter sorter)
+        {
+            sorter.Dispose();
         }
 
         /// <summary>
@@ -64,18 +73,6 @@ namespace Badget.LibListview.Sorting
         {
             lst.ColumnClick -= eventDoSort;
             lst = null;
-        }
-
-        /// <summary>
-        /// Destructor
-        /// </summary>
-        ~Sorter()
-        {
-            try
-            {
-                Dispose();
-            }
-            catch { }
         }
     }
 

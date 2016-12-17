@@ -33,9 +33,47 @@ namespace Badget.LibListview.Controls
         public NativeListView()
             : base()
         {
-            this.FullRowSelect = true;
+           this.FullRowSelect = true;
         }
+        
+        [DllImport("user32.dll")]
+        static extern int SendMessage(IntPtr window, int message, int wParam, IntPtr lParam);
 
+        /// <summary>
+        /// Sets the GroupState
+        /// </summary>
+        /// <param name="state"></param>
+        public void SetGroupCollapse(GroupState state)
+        {
+
+            for (int i = 0; i <= this.Groups.Count; i++)
+            {
+
+                LVGROUP group = new LVGROUP();
+                group.cbSize = Marshal.SizeOf(group);
+                group.state = (int)state; // LVGS_COLLAPSIBLE 
+                group.mask = 4; // LVGF_STATE 
+                group.iGroupId = i;
+
+                IntPtr ip = IntPtr.Zero;
+                try
+                {
+                    ip = Marshal.AllocHGlobal(group.cbSize);
+                    Marshal.StructureToPtr(group, ip, true);
+                    SendMessage(this.Handle, 0x1000 + 147, i, ip); // #define LVM_SETGROUPINFO (LVM_FIRST + 147) 
+                }
+
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Trace.WriteLine(ex.Message + Environment.NewLine + ex.StackTrace);
+                }
+                finally
+                {
+                    if (null != ip) Marshal.FreeHGlobal(ip);
+                }
+            }
+
+        }
 
 
         /// <summary>
@@ -52,6 +90,57 @@ namespace Badget.LibListview.Controls
                 NativeMethods.SendMessage(this.Handle, LVM_SETEXTENDEDLISTVIEWSTYLE, new IntPtr(LVS_EX_DOUBLEBUFFER), new IntPtr(LVS_EX_DOUBLEBUFFER));
             }
         }
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct LVGROUP
+        {
+
+            public int cbSize;
+
+            public int mask;
+
+            [MarshalAs(UnmanagedType.LPTStr)]
+
+            public string pszHeader;
+
+            public int cchHeader;
+
+            [MarshalAs(UnmanagedType.LPTStr)]
+
+            public string pszFooter;
+
+            public int cchFooter;
+
+            public int iGroupId;
+
+            public int stateMask;
+
+            public int state;
+
+            public int uAlign;
+
+        }
+
+        /// <summary>
+        /// Provides States for the GroupExpander
+        /// </summary>
+        public enum GroupState
+        {
+            /// <summary>
+            /// The Group is collapsible
+            /// </summary>
+            COLLAPSIBLE = 8,
+            /// <summary>
+            /// The Group is collapsed
+            /// </summary>
+            COLLAPSED = 1,
+            /// <summary>
+            /// The Group is expanded
+            /// </summary>
+            EXPANDED = 0
+        }
+
     }
     internal static class NativeMethods
     {

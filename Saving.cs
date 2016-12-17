@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 using static System.Windows.Forms.ListViewItem;
 
 namespace Badget.LibListview.Saving
-{ 
+{
     /// <summary>
     /// Provides a <see cref="CSVItemsFile"/> Class 
     /// </summary>
@@ -159,14 +159,16 @@ namespace Badget.LibListview.Saving
             if (listview == null)
                 throw new ArgumentNullException("listview");
 
-            XmlSerializer serializer = new XmlSerializer(typeof(ListViewSerializedItem));
+            XmlSerializer serializer = new XmlSerializer(typeof(ListViewSerializedItem[]));
             StreamReader reader = new StreamReader(file);
 
             if (serializer.CanDeserialize(XmlReader.Create(reader)))
             {
                 ListViewSerializedItem[] items = (ListViewSerializedItem[])serializer.Deserialize(reader);
-                
-                foreach(var item in items)
+
+                reader.Close();
+                reader.Dispose();
+                foreach (var item in items)
                 {
                     ListViewItem i = item.ToListViewItem();
                     listview.Items.Add(i);
@@ -176,8 +178,14 @@ namespace Badget.LibListview.Saving
             }
             else
                 throw new FormatException("File isn't a valid XML Input File");
+            try
+            {
+                reader.Close();
+                reader.Dispose();
+            }
+            finally { }
         }
-        
+
         /// <summary>
         /// Loads items from a file and returns there
         /// </summary>
@@ -188,7 +196,7 @@ namespace Badget.LibListview.Saving
             if (!File.Exists(file))
                 throw new FileNotFoundException();
 
-            XmlSerializer serializer = new XmlSerializer(typeof(ListViewSerializedItem));
+            XmlSerializer serializer = new XmlSerializer(typeof(ListViewSerializedItem[]));
             StreamReader reader = new StreamReader(file);
 
             List<ListViewItem> Items = new List<ListViewItem>();
@@ -207,7 +215,8 @@ namespace Badget.LibListview.Saving
             }
             else
                 throw new FormatException("File isn't a valid XML Input File");
-
+            reader.Close();
+            reader.Dispose();
             return Items.ToArray();
         }
 
@@ -227,10 +236,7 @@ namespace Badget.LibListview.Saving
             if (GlobalFunctions.ContainsIllegalFilenameChar(file) || GlobalFunctions.ContainsIllegalPathnameChars(file))
                 throw new ArgumentException("Illegal characters in path. Parameter \"file\"");
 
-            if (!Directory.Exists(Path.GetPathRoot(file)))
-                throw new DriveNotFoundException("Drive \"" + Path.GetPathRoot(file) + "\" not found");
-
-            if (!Directory.Exists(Path.GetDirectoryName(file)))
+            if (!Directory.Exists(Path.GetDirectoryName(file)) && file.Contains("\\"))
                 Directory.CreateDirectory(file);
 
             SaveItemsToFile(listview.Items, file);
@@ -252,27 +258,35 @@ namespace Badget.LibListview.Saving
             if (GlobalFunctions.ContainsIllegalFilenameChar(file) || GlobalFunctions.ContainsIllegalPathnameChars(file))
                 throw new ArgumentException("Illegal characters in path. Parameter \"file\"");
 
-            if (!Directory.Exists(Path.GetPathRoot(file)))
+            if (!Directory.Exists(Path.GetPathRoot(file)) && Path.GetPathRoot(file).Length > 0)
                 throw new DriveNotFoundException("Drive \"" + Path.GetPathRoot(file) + "\" not found");
 
-            if (!Directory.Exists(Path.GetDirectoryName(file)))
+            if (!Directory.Exists(Path.GetDirectoryName(file)) && file.Contains("\\"))
                 Directory.CreateDirectory(file);
 
             List<ListViewSerializedItem> modAll = new List<ListViewSerializedItem>();
 
-            foreach(ListViewItem i in items)
+            foreach (ListViewItem i in items)
             {
                 ListViewSerializedItem item = new ListViewSerializedItem(i);
-                foreach(ListViewSubItem itemSub in i.SubItems)
+                foreach (ListViewSubItem itemSub in i.SubItems)
                 {
                     
                 }
                 modAll.Add(item);
             }
 
-            XmlSerializer serializer = new XmlSerializer(typeof(ListViewSerializedItem));
-            StreamWriter writer = new StreamWriter(file);
+            XmlSerializer serializer = new XmlSerializer(typeof(ListViewSerializedItem[]));
+            StreamWriter writer;
 
+            if (System.IO.File.Exists(file))
+                writer = new StreamWriter(file);
+            else
+            {
+                var str = File.Create(file);
+                str.Close();
+                writer = new StreamWriter(file);
+            }
             serializer.Serialize(writer, modAll.ToArray());
 
             writer.Close();
@@ -281,7 +295,7 @@ namespace Badget.LibListview.Saving
         /// <summary>
         /// Provides a struct for a serializable ListView Item
         /// </summary>
-        public struct ListViewSerializedItem
+        public class ListViewSerializedItem
         {
             public ListViewItem ToListViewItem()
             {
@@ -300,8 +314,7 @@ namespace Badget.LibListview.Saving
                 i.ForeColor = ColorTranslator.FromHtml(ForeColor.ColorHEX);
                 i.Checked = Checked;
                 i.Focused = Focused;
-                i.Font = Font;
-                i.Group = Group;
+                i.Font = new Font(Font.FontName, Font.FontSize, Font.FontStyle);
                 i.ImageIndex = ImageIndex;
                 i.ImageKey = ImageKey;
                 i.IndentCount = IndentCount;
@@ -311,14 +324,15 @@ namespace Badget.LibListview.Saving
                 i.ToolTipText = ToolTipText;
                 return i;
             }
-
+            public ListViewSerializedItem()
+            { }
             public ListViewSerializedItem(ListViewItem item)
             {
                 Text = item.Text;
 
                 List<ListViewSerializedItem> sub = new List<ListViewSerializedItem>();
-                foreach (ListViewItem itemS in item.SubItems)
-                    sub.Add(new Saving.XMLItemsFile.ListViewSerializedItem(itemS));
+                foreach (ListViewSubItem itemS in item.SubItems)
+                    sub.Add(new ListViewSerializedItem(itemS));
                 SubItems = sub.ToArray();
 
                 Name = item.Name;
@@ -326,8 +340,7 @@ namespace Badget.LibListview.Saving
                 ForeColor = new ColorCC(ColorTranslator.ToHtml(item.ForeColor));
                 Checked = item.Checked;
                 Focused = item.Focused;
-                Font = item.Font;
-                Group = item.Group;
+                Font = new FontCC(item.Font.Name, item.Font.Size, item.Font.Style);
                 ImageIndex = item.ImageIndex;
                 ImageKey = item.ImageKey;
                 IndentCount = item.IndentCount;
@@ -337,25 +350,47 @@ namespace Badget.LibListview.Saving
                 ToolTipText = item.ToolTipText;
             }
 
-            string Text;
-            ListViewSerializedItem[] SubItems;
-            string Name;
-            ColorCC BackColor;
-            ColorCC ForeColor;
-            bool Checked;
-            bool Focused;
-            Font Font;
-            ListViewGroup Group;
-            int ImageIndex;
-            string ImageKey;
-            int IndentCount;
-            bool Selected;
-            int StateImageIndex;
-            bool UseItemStyleForSubItems;
-            string ToolTipText;
+            public ListViewSerializedItem(ListViewSubItem item)
+            {
+                Text = item.Text;
+
+                SubItems = null;
+
+                Name = item.Name;
+                BackColor = new ColorCC(ColorTranslator.ToHtml(item.BackColor));
+                ForeColor = new ColorCC(ColorTranslator.ToHtml(item.ForeColor));
+                Font = new FontCC(item.Font.Name, item.Font.Size, item.Font.Style);
+                Focused = false;
+                Checked = false;
+                ImageIndex = 0;
+                ImageKey = string.Empty;
+                IndentCount = 0;
+                Selected = false;
+                StateImageIndex = 0;
+                UseItemStyleForSubItems = true;
+                ToolTipText = string.Empty;
+            }
+
+            public string Text;
+            public ListViewSerializedItem[] SubItems;
+            public string Name;
+            public ColorCC BackColor;
+            public ColorCC ForeColor;
+            public bool Checked;
+            public bool Focused;
+            public FontCC Font;
+            public int ImageIndex;
+            public string ImageKey;
+            public int IndentCount;
+            public bool Selected;
+            public int StateImageIndex;
+            public bool UseItemStyleForSubItems;
+            public string ToolTipText;
         }
-        internal struct ColorCC
+        public class ColorCC
         {
+            public ColorCC()
+            { }
             public ColorCC(string hex)
             {
                 ColorHEX = hex;
@@ -365,6 +400,20 @@ namespace Badget.LibListview.Saving
                 get;
                 set;
             }
+        }
+        public class FontCC
+        {
+            public FontCC()
+            { }
+            public FontCC(string fontname, float fontsize, FontStyle style)
+            {
+                FontName = fontname;
+                FontSize = fontsize;
+                FontStyle = style;
+            }
+            public string FontName;
+            public float FontSize;
+            public FontStyle FontStyle;
         }
     }
 
